@@ -1,0 +1,826 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/TheRealLxops/Vynixius-ui-lib-/main/source.lua"))()
+
+if SYPN_LOADED and not _G.SYPN_DEBUG == true then
+	Library:Notify({title = "Xostum SYPN", text = "Xostum Already Loaded."}, function(selection)end)
+	return
+end
+
+pcall(function() getgenv().SYPN_LOADED = true end)
+
+if game:IsLoaded() then
+	local OrgSpeed = game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed
+	local OrgFov = game:GetService("Workspace").Camera.FieldOfView
+	local OrgJumpPower = game:GetService("Players").LocalPlayer.Character.Humanoid.JumpPower
+	local OrgJumpHeight = game:GetService("Players").LocalPlayer.Character.Humanoid.JumpHeight 
+	local OrgGravity = game:GetService("Workspace").Gravity
+	local valued = 1
+	local HL = Instance.new("Highlight")
+	local SD = Instance.new("Sound");SD.Volume = 10
+	local Plr = game:GetService("Players").LocalPlayer
+	local Clipon = false
+	local gotospeed = 1
+	local usetween = true
+	local usesounds = false
+	local useavatar = false
+	local IsWalkTo = false
+	local lastfpsset = 60
+	local TextSizeOfEsp = 24
+	local DistanceOfPlayer = false
+	local NameOfPlayer = true
+	local GameParts = {
+		game:GetService("Workspace"):FindFirstChild("Apple"),
+		game:GetService("Workspace"):FindFirstChild("Apple2"),
+		game:GetService("Workspace"):FindFirstChild("Apple3"),
+		game:GetService("Workspace"):FindFirstChild("BloxyCola"),
+		game:GetService("Workspace"):FindFirstChild("BloxyCola2"),
+		game:GetService("Workspace"):FindFirstChild("BloxyCola3"),
+		game:GetService("Workspace"):FindFirstChild("Cookie"),
+		game:GetService("Workspace"):FindFirstChild("Cookie2"),
+		game:GetService("Workspace"):FindFirstChild("Cookie3"),
+		game:GetService("Workspace"):FindFirstChild("Money"),
+		game:GetService("Workspace"):FindFirstChild("Money2"),
+		game:GetService("Workspace"):FindFirstChild("Money3"),
+	}
+
+	local Window = Library:AddWindow({
+		title = {"SYPN", "Drake In"},
+		theme = {
+			Accent = Color3.fromRGB(100,100,255)
+		},
+		key = Enum.KeyCode.RightControl,
+		default = true
+	})
+	local BillboardGui = Instance.new("BillboardGui")
+	local TextOfGui = Instance.new("TextLabel")
+	BillboardGui.AlwaysOnTop = true
+	BillboardGui.StudsOffset = Vector3.new(0, 1.5, 0)
+	TextOfGui.Parent = BillboardGui
+	TextOfGui.BackgroundTransparency = 1.000
+	TextOfGui.Font = Enum.Font.SourceSans
+	TextOfGui.Text = "Loading..."
+	TextOfGui.TextColor3 = Color3.fromRGB(255, 255, 255)
+	TextOfGui.TextSize = 23.000
+
+	local Tab = Window:AddTab("LocalPlayer", {default = true})
+	local Tab2 = Window:AddTab("Utilities", {default = false})
+	local Tab3 = Window:AddTab("Visuals", {default = false})
+	local Tab5 = Window:AddTab("Teleportion", {default = false})
+	local Tab4 = Window:AddTab("Settings", {default = false})
+
+	local Section = Tab:AddSection("Character", {default = false})
+	local Section5674 = Tab:AddSection("Client", {default = false})
+
+	local Slider = Section:AddSlider("WalkSpeed", 1, 500, 16, {toggleable = true, default = false, flag = "Slider_Flag", fireontoggle = true, fireondrag = true, rounded = true}, function(val, bool)
+		if bool then
+			game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed = val
+		else
+			game:GetService("Players").LocalPlayer.Character.Humanoid.WalkSpeed = OrgSpeed
+		end
+	end)
+	local Slider2 = Section:AddSlider("JumpPower", 1, 250, 50, {toggleable = true, default = false, flag = "Slider_Flag", fireontoggle = true, fireondrag = true, rounded = true}, function(val, bool)
+		if bool then
+			game:GetService("Players").LocalPlayer.Character.Humanoid.JumpPower = val
+			game:GetService("Players").LocalPlayer.Character.Humanoid.JumpHeight = val
+		else
+			game:GetService("Players").LocalPlayer.Character.Humanoid.JumpPower = OrgJumpPower
+			game:GetService("Players").LocalPlayer.Character.Humanoid.JumpHeight = OrgJumpHeight
+		end
+	end)
+	local Slider3 = Section:AddSlider("FieldOfView", 1, 120, 70, {toggleable = true, default = false, flag = "Slider_Flag", fireontoggle = true, fireondrag = true, rounded = true}, function(val, bool)
+		if bool then
+			game:GetService("Workspace").Camera.FieldOfView = val
+		else
+			game:GetService("Workspace").Camera.FieldOfView = OrgFov
+		end
+	end)
+	local Slider4 = Section:AddSlider("Gravity", 1, 196, 196, {toggleable = true, default = false, flag = "Slider_Flag", fireontoggle = true, fireondrag = true, rounded = true}, function(val, bool)
+		if bool then
+			game:GetService("Workspace").Gravity = val
+		else
+			game:GetService("Workspace").Gravity = OrgGravity
+		end
+	end)
+	local booledforfreelmfao = true
+	local Slider4888 = Section5674:AddSlider("Performances", 1, 360, 60, {toggleable = true, default = false, flag = "Slider_Flag", fireontoggle = true, fireondrag = true, rounded = true}, function(val, bool)
+		if bool then
+			setfpscap(val)
+			lastfpsset = val
+			booledforfreelmfao = false
+		else
+			if booledforfreelmfao == false then
+				setfpscap(60)
+				lastfpsset = 60
+			end
+		end
+	end)
+	local ButtonFPS = Section5674:AddButton("Notify FPS", function()
+		local startTime = tick()
+		local endTime = startTime + 1
+		local frameCount = 0
+
+		game:GetService("RunService").RenderStepped:Connect(function()
+			frameCount = frameCount + 1
+		end)
+
+		while tick() < endTime do
+			wait()
+		end
+		Library:Notify({title = "Peformance", text = "FPS: "..frameCount / (endTime - startTime)}, function(selection)end)
+	end)
+
+	local connection190 = nil
+	local Toggle90 = Section:AddToggle("Infinite Jumps", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			connection190 = game:GetService("UserInputService").JumpRequest:Connect(function()
+				game.Players.LocalPlayer.Character:FindFirstChild("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+			end)elseif bool == false then if connection190 ~= nil then connection190:Disconnect()end;wait()connection190=nil end
+	end)
+	local connection290 = nil
+	local Toggle90 = Section:AddToggle("NoClip", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			Clipon = true
+			connection290 = game:GetService("RunService").Stepped:Connect(function()
+				if not Clipon == false then
+					for a, b in pairs(game:GetService("Workspace"):GetChildren()) do
+						if b.Name == Plr.Name then
+							for i, v in pairs(game:GetService("Workspace")[Plr.Name]:GetChildren()) do
+								if v:IsA("BasePart") then
+									v.CanCollide = false
+								end end end end
+				else
+					connection290:Disconnect()
+				end
+			end)
+		elseif bool == false then Clipon = false if connection290 ~= nil then connection290:Disconnect()end;wait()connection290=nil end
+	end)
+
+	local Section2 = Tab2:AddSection("Utilities", {default = false})
+
+	local Button2 = Section2:AddButton("Basement Door", function()
+		args446564 = {[1] = "Basement"}game:GetService("ReplicatedStorage").RemoteEvents.Door:FireServer(unpack(args446564))
+	end)
+	local Button3 = Section2:AddButton("Attic Door", function()
+		drugs = {[1] = "Attic"}game:GetService("ReplicatedStorage").RemoteEvents.Door:FireServer(unpack(drugs))
+	end)
+	local Button4 = Section2:AddButton("Front Door", function()
+		azzzzrgs = {[1] = "Front"}game:GetService("ReplicatedStorage").RemoteEvents.Door:FireServer(unpack(azzzzrgs))
+	end)
+	local Button5 = Section2:AddButton("Friend Cat", function()
+		game:GetService("ReplicatedStorage").RemoteEvents.Cattery:FireServer()
+	end)
+	local connection19 = nil
+	local Toggle9 = Section2:AddToggle("Infinite Planks", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			connection19 = game:GetService("RunService").stepped:Connect(function()
+				game:GetService("ReplicatedStorage").RemoteEvents.RefreshPlanks:FireServer()
+			end)elseif bool == false then if connection19 ~= nil then connection19:Disconnect()end;wait()connection19=nil end
+	end)
+	local connection1 = nil
+	local Toggle9 = Section2:AddToggle("Loop Basement Door", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			connection1 = game:GetService("RunService").stepped:Connect(function()
+				args446564 = {[1] = "Basement"}game:GetService("ReplicatedStorage").RemoteEvents.Door:FireServer(unpack(args446564))
+			end)elseif bool == false then if connection1 ~= nil then connection1:Disconnect()end;wait()connection1=nil end
+	end)
+	local connection2 = nil
+	local Toggle8 = Section2:AddToggle("Loop Attic Door", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			connection2 = game:GetService("RunService").stepped:Connect(function()
+				drugs = {[1] = "Attic"}game:GetService("ReplicatedStorage").RemoteEvents.Door:FireServer(unpack(drugs))
+			end)elseif bool == false then if connection2 ~= nil then connection2:Disconnect()end;wait()connection2=nil end
+	end)
+	local connection3 = nil
+	local Toggle7 = Section2:AddToggle("Loop Front Door", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			connection3 = game:GetService("RunService").stepped:Connect(function()
+				azzzzrgs = {[1] = "Front"}game:GetService("ReplicatedStorage").RemoteEvents.Door:FireServer(unpack(azzzzrgs))
+			end)elseif bool == false then if connection3 ~= nil then connection3:Disconnect()end;wait()connection3=nil end
+	end)
+	local connection4 = nil
+	local Toggle6 = Section2:AddToggle("Loop Open Drawers", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			connection4 = game:GetService("RunService").stepped:Connect(function()
+				for i,v in pairs(game:GetService("Workspace"):FindFirstChild("Drawers"):GetDescendants())do if v.Name=="ClickDetector" and v.Parent.Name=="Drawer"then fireclickdetector(v)end end
+			end) elseif bool == false then if connection4 ~= nil then connection4:Disconnect()end;wait()connection4=nil end
+	end)
+	local connection5 = nil
+	local Toggle5 = Section2:AddToggle("Kill Enemeies Aura", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			connection5 = game:GetService("RunService").stepped:Connect(function()
+				for i,v in pairs(game.Workspace.BadGuys:GetChildren()) do
+					for i = 1,1 do
+						game:GetService("ReplicatedStorage").RemoteEvents.HitBadguy:FireServer(v,10)
+						game:GetService("ReplicatedStorage").RemoteEvents.HitBadguy:FireServer(v,996)
+						game:GetService("ReplicatedStorage").RemoteEvents.HitBadguy:FireServer(v,9)
+						game:GetService("ReplicatedStorage").RemoteEvents.HitBadguy:FireServer(v,8)
+						game:GetService("ReplicatedStorage").RemoteEvents.HitBadguy:FireServer(v,996)
+					end end
+			end) elseif bool == false then if connection5 ~= nil then connection5:Disconnect()end;wait()connection5=nil end
+	end)
+	local connection12 = nil
+	local Toggle10 = Section2:AddToggle("Heal Yourself", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			connection4 = game:GetService("RunService").stepped:Connect(function()
+				if valued == 1 then
+					local CatHealer = {[1] = "Cat"}
+					game:GetService("ReplicatedStorage").RemoteEvents.Energy:FireServer(unpack(CatHealer))
+					game:GetService("ReplicatedStorage").RemoteEvents.BedTime:FireServer()
+				else
+					for i = 1,valued do
+						local CatHealer = {[1] = "Cat"}
+						game:GetService("ReplicatedStorage").RemoteEvents.Energy:FireServer(unpack(CatHealer))
+						game:GetService("ReplicatedStorage").RemoteEvents.BedTime:FireServer()
+					end
+				end
+
+			end) elseif bool == false then if connection4 ~= nil then connection4:Disconnect()end;wait()connection4=nil end
+	end)
+	local Slider6 = Section2:AddSlider("MultiHeal", 1, 10, 1, {toggleable = false, default = false, flag = "Slider_Flag", fireontoggle = true, fireondrag = true, rounded = true}, function(val, bool)
+		valued = val
+	end)
+
+	local SubSection3 = Section2:AddSubSection("Targets", {default = false})
+	local Button51 = SubSection3:AddButton("Unlock Basement", function()
+		game:GetService("ReplicatedStorage").RemoteEvents.UnlockDoor:FireServer()
+		game:GetService("ReplicatedStorage").RemoteEvents.BasementMission:FireServer()
+	end)
+	local lastpositionofplayerhumanoidrootpart=nil
+	local Button52 = SubSection3:AddButton("Unlock Attic", function()
+		if game:GetService("Workspace"):FindFirstChild("Basement") then
+			if game:GetService("Workspace"):FindFirstChild("Basement"):FindFirstChild("Ladder") then
+				if game:GetService("Workspace"):FindFirstChild("Basement"):FindFirstChild("Ladder"):FindFirstChild("ClickDetector") then
+					fireclickdetector(game:GetService("Workspace"):FindFirstChild("Basement"):FindFirstChild("Ladder"):FindFirstChild("ClickDetector"))
+					lastpositionofplayerhumanoidrootpart = game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame
+					wait(0.1)
+					game:GetService("TweenService"):Create(game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart"), TweenInfo.new(gotospeed, Enum.EasingStyle.Quad, Enum.EasingDirection.Out, 0), {CFrame = CFrame.new(-20.21592140197754, 20.379079818725586, -227.04872131347656)}):Play()
+					wait(gotospeed)
+					game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = lastpositionofplayerhumanoidrootpart
+					wait()lastpositionofplayerhumanoidrootpart=nil
+				end
+			end
+		end
+	end)
+	local worthlesslocal = true
+	local Button53 = SubSection3:AddButton("Open Safe", function()
+		if worthlesslocal == true then
+			worthlesslocal = false
+			Library:Notify({title = "Warning", text = "If The Safe Isn't Found Click The Button Of This Notification To Found It, Then Click Again."}, function(selection)
+				if selection == true then
+					local Paint1 = {
+						[1] = "rbxassetid://3195645674"
+					}
+					game:GetService("ReplicatedStorage").RemoteEvents.PaintingClicked:FireServer(unpack(Paint1))
+					local Paint2 = {
+						[1] = "rbxassetid://3195645922"
+					}
+					game:GetService("ReplicatedStorage").RemoteEvents.PaintingClicked:FireServer(unpack(Paint2))
+					local Paint3 = {
+						[1] = "http://www.roblox.com/asset/?id=363240671"
+					}
+					game:GetService("ReplicatedStorage").RemoteEvents.PaintingClicked:FireServer(unpack(Paint3))
+					local Paint4 = {
+						[1] = "http://www.roblox.com/asset/?id=178210631"
+					}
+					game:GetService("ReplicatedStorage").RemoteEvents.PaintingClicked:FireServer(unpack(Paint4))
+					local Paint5 = {
+						[1] = "http://www.roblox.com/asset/?id=3246691515"
+					}
+					game:GetService("ReplicatedStorage").RemoteEvents.PaintingClicked:FireServer(unpack(Paint5))
+				end
+			end)
+		else
+			game.ReplicatedStorage.RemoteEvents.Safe:FireServer(game:GetService("Workspace").CodeNote.SurfaceGui.TextLabel.Text)
+		end
+	end)
+
+	local SelectedItemIs = nil
+	local Amount1 = 1
+	local Section21 = Tab2:AddSection("Item Giver", {default = false})
+
+	local Dropdown = Section21:AddDropdown("Select", {
+		"Chips",
+		"BloxyCola", -- MultiPack
+		"Expired BloxyCola",
+		"Cookie", -- MultiPack
+		"Teddy",
+		"Hammer",
+		"Cure",
+		"Plank",
+		"Sword",
+		"Key",
+		"Expired Pizza",
+		"Mini Pizza",
+		"Pizza",
+		"Medkit",
+		"Apple", -- MultiPack
+		"Bat",
+		"Lollipop"
+	}, {default = "Chips"}, function(selected)
+		SelectedItemIs = selected
+	end)
+	local Button12 = Section21:AddButton("Get Item", function()
+		if SelectedItemIs == nil then
+			return SelectedItemIs;
+		else
+			if SelectedItemIs == "Chips" then
+				game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("Chips")
+			end
+			if SelectedItemIs == "BloxyCola" then
+				for i = 1,Amount1 do
+					game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("BloxyCola")
+				end
+			end
+			if SelectedItemIs == "Expired BloxyCola" then
+				game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("ExpiredBloxyCola")
+			end
+			if SelectedItemIs == "Cookie" then
+				for i = 1,Amount1 do
+					game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("Cookie")
+				end
+			end
+			if SelectedItemIs == "Teddy" then
+				game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("TeddyBloxpin")
+			end
+			if SelectedItemIs == "Hammer" then
+				game:GetService("ReplicatedStorage").RemoteEvents.BasementWeapon:FireServer(true, "Hammer")
+			end
+			if SelectedItemIs == "Cure" then
+				game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("Cure")
+			end
+			if SelectedItemIs == "Medkit" then
+				game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("MedKit")
+			end
+			if SelectedItemIs == "Plank" then
+				game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("Plank")
+			end
+			if SelectedItemIs == "Sword" then
+				game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("LinkedSword")
+			end
+			if SelectedItemIs == "Key" then
+				game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("Key")
+			end
+			if SelectedItemIs == "Expired Pizza" then
+				game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("EpicPizza")
+			end
+			if SelectedItemIs == "Mini Pizza" then
+				game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("Pizza1")
+			end
+			if SelectedItemIs == "Pizza" then
+				game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("Pizza2")
+			end
+			if SelectedItemIs == "Apple" then
+				for i = 1,Amount1 do
+					game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("Apple")
+				end
+			end
+			if SelectedItemIs == "Bat" then
+				game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("Bat")
+			end
+			if SelectedItemIs == "Lollipop" then
+				game.ReplicatedStorage.RemoteEvents.GiveTool:FireServer("Lollipop")
+			end
+		end
+	end)
+
+	local Section22 = Tab2:AddSection("Trolling", {default = false})
+
+
+	local Box = Section22:AddBox("Kill Player", {fireonempty = false}, function(text)
+		for _, player in ipairs(game.Players:GetPlayers()) do
+			if player ~= game:GetService("Players").LocalPlayer then
+				if player.Name:lower():find(text:lower()) == 1 then
+					local args = {[1] = 1,[2] = player}
+					game:GetService("ReplicatedStorage").RemoteEvents.ToxicDrown:FireServer(unpack(args))
+					if usesounds == true then
+						local SDC = SD:Clone()
+						SDC.SoundId = "http://www.roblox.com/asset/?id=130819307"
+						SDC.Parent = game:GetService("Workspace");SDC:Play()
+						wait(1.2)
+						SDC:Destroy()
+					end
+					return
+				elseif player.DisplayName:lower():find(text:lower()) == 1 then
+					local args = {[1] = 1,[2] = player}
+					game:GetService("ReplicatedStorage").RemoteEvents.ToxicDrown:FireServer(unpack(args))
+					if usesounds == true then
+						local SDC = SD:Clone()
+						SDC.SoundId = "http://www.roblox.com/asset/?id=130819307"
+						SDC.Parent = game:GetService("Workspace");SDC:Play()
+						wait(1.2)
+						SDC:Destroy()
+					end
+					return
+				end
+			end
+		end
+	end)
+
+	local Button88 = Section22:AddButton("Kill All", function()
+		for i, player in pairs(game.Players:GetPlayers()) do
+			if player ~= game.Players.LocalPlayer then
+				local args = {[1] = 1,[2] = player}
+				game:GetService("ReplicatedStorage").RemoteEvents.ToxicDrown:FireServer(unpack(args))
+			end
+		end
+		if usesounds == true then
+			local SDC = SD:Clone()
+			SDC.SoundId = "http://www.roblox.com/asset/?id=3689357590"
+			SDC.Parent = game:GetService("Workspace");SDC:Play()
+			wait(3)
+			SDC:Destroy()
+		end
+	end)
+	local Connection10 = nil
+	local Button889 = Section22:AddButton("Crash Server", function()
+		if Connection10 == nil then
+			Connection10 = game:GetService("RunService").Stepped:Connect(function()
+				for i = 1,100 do
+					game:GetService("ReplicatedStorage").RemoteEvents.Cattery:FireServer()
+					game:GetService("ReplicatedStorage").RemoteEvents.UnlockDoor:FireServer()
+					game:GetService("ReplicatedStorage").RemoteEvents.BasementMission:FireServer()
+				end
+			end)
+		else
+			if Connection10 ~= nil then
+				Connection10:Disconnect()
+			end
+			Connection10 = nil
+		end
+	end)
+	local Slider66 = Section21:AddSlider("Amount", 1, 500, 1, {toggleable = false, default = false, flag = "Slider_Flag", fireontoggle = true, fireondrag = true, rounded = true}, function(val, bool)
+		Amount1 = val
+	end)
+
+	local Section269 = Tab2:AddSection("Roles", {default = false})
+	local SubSection1 = Section269:AddSubSection("Role", {default = false})
+	local Button8891 = SubSection1:AddButton("Stealthy", function()
+		local A452zx1z1 = "TeddyBloxpin"
+		local Evsex2 = game:GetService("ReplicatedStorage").RemoteEvents.OutsideRole
+		Evsex2:FireServer(A452zx1z1, useavatar)
+	end)
+	local Button88918 = SubSection1:AddButton("Hungry", function()
+		local A452zx1z1 = "Chips"
+		local Evsex2 = game:GetService("ReplicatedStorage").RemoteEvents.OutsideRole
+		Evsex2:FireServer(A452zx1z1, useavatar)
+	end)
+	local Button88912 = SubSection1:AddButton("Lollipop", function()
+		local A452zx1z1 = "Lollipop"
+		local Evsex2 = game:GetService("ReplicatedStorage").RemoteEvents.OutsideRole
+		Evsex2:FireServer(A452zx1z1, useavatar)
+	end)
+	local Button88913 = SubSection1:AddButton("Fighter", function()
+		local A452zx1z1 = "Sword"
+		local Evsex2 = game:GetService("ReplicatedStorage").RemoteEvents.OutsideRole
+		Evsex2:FireServer(A452zx1z1, useavatar)
+	end)
+	local Button88914 = SubSection1:AddButton("Officer", function()
+		local A452zx1z1 = "Gun"
+		local Evsex2 = game:GetService("ReplicatedStorage").RemoteEvents.OutsideRole
+		Evsex2:FireServer(A452zx1z1, useavatar)
+	end)
+	local Button88915 = SubSection1:AddButton("Medic", function()
+		local A452zx1z1 = "MedKit"
+		local Evsex2 = game:GetService("ReplicatedStorage").RemoteEvents.OutsideRole
+		Evsex2:FireServer(A452zx1z1, useavatar)
+	end)
+	local Button88916 = SubSection1:AddButton("Protector", function()
+		local A452zx1z1 = "Bat"
+		local Evsex2 = game:GetService("ReplicatedStorage").RemoteEvents.OutsideRole
+		Evsex2:FireServer(A452zx1z1, useavatar)
+	end)
+	local Button88917 = SubSection1:AddButton("Swat", function()
+		local A452zx1z1 = "SwatGun"
+		local Evsex2 = game:GetService("ReplicatedStorage").RemoteEvents.OutsideRole
+		Evsex2:FireServer(A452zx1z1, useavatar)
+	end)
+	local Toggle920 = Section269:AddToggle("Use Avatar", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			useavatar = true
+		elseif bool == false then
+			if useavatar == true then
+				useavatar = false;end
+		end
+	end)
+	local Label69LMFAO = Section269:AddLabel("Section Only Works For Main")
+
+	local Section25 = Tab5:AddSection("Players", {default = false})
+	local Box3 = Section25:AddBox("Teleport To", {fireonempty = false}, function(text)
+		for _, player in ipairs(game.Players:GetPlayers()) do
+			if player ~= game:GetService("Players").LocalPlayer then
+				if player.Name:lower():find(text:lower()) == 1 then
+					if usetween == true then
+						game:GetService("TweenService"):Create(game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart"),TweenInfo.new(gotospeed,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{CFrame = player.Character:FindFirstChild("HumanoidRootPart").CFrame}):Play()
+					elseif IsWalkTo == true then
+						repeat wait() until game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid");
+						game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):MoveTo(player.Character:FindFirstChild("HumanoidRootPart").Position)
+					elseif IsWalkTo == false and usetween == false then
+						game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = player.Character:FindFirstChild("HumanoidRootPart").CFrame
+						if usesounds == true then
+							local SDC = SD:Clone()
+							SDC.SoundId = "http://www.roblox.com/asset/?id=5066021887"
+							SDC.Parent = game:GetService("Workspace");SDC:Play()
+							wait(1.2)
+							SDC:Destroy()
+						end
+						return
+					end
+					return
+				elseif player.DisplayName:lower():find(text:lower()) == 1 then
+					if usetween == true then
+						game:GetService("TweenService"):Create(game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart"),TweenInfo.new(gotospeed,Enum.EasingStyle.Quad,Enum.EasingDirection.Out),{CFrame = player.Character:FindFirstChild("HumanoidRootPart").CFrame}):Play()
+					elseif IsWalkTo == true then
+						repeat wait() until game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid");
+						game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):MoveTo(player.Character:FindFirstChild("HumanoidRootPart").Position)
+					elseif IsWalkTo == false and usetween == false then
+						game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = player.Character:FindFirstChild("HumanoidRootPart").CFrame
+						if usesounds == true then
+							local SDC = SD:Clone()
+							SDC.SoundId = "http://www.roblox.com/asset/?id=5066021887"
+							SDC.Parent = game:GetService("Workspace");SDC:Play()
+							wait(1.2)
+							SDC:Destroy()
+						end
+						return
+					end
+					return
+				end
+			end
+		end
+	end)
+	local Slider457686543 = Section25:AddSlider("Tween Speed", 1, 5, 1, {toggleable = true, default = true, flag = "Slider_Flag", fireontoggle = true, fireondrag = true, rounded = true}, function(val, bool)
+		gotospeed = val
+		usetween = bool
+	end)
+	connecitonforfree = nil
+	local ToggleNIGGER = Section25:AddToggle("WalkTo", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			IsWalkTo = true
+			connecitonforfree = game:GetService("RunService").Stepped:Connect(function()
+				usetween = false
+			end)
+		elseif bool == false then if IsWalkTo ~= false then if connecitonforfree ~= nil then connecitonforfree:Disconnect()usetween=true;wait()connecitonforfree = nil end IsWalkTo = false Slider457686543.default = true end end
+	end)
+
+	local Section26 = Tab5:AddSection("Locations", {default = false})
+	local SubSection2 = Section26:AddSubSection("Teleports", {default = false})
+	local Labelx = SubSection2:AddLabel("This Option Is Not Available")
+
+
+	local Section20 = Tab3:AddSection("ESP", {default = false})
+	local Section202 = Tab3:AddSection("Drawing", {default = false})
+
+	connectionsxxnx = nil
+	local Toggle699 = Section20:AddToggle("Players ESP", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			connectionsxxnx = game:GetService("RunService").stepped:Connect(function()
+				for _,v in pairs(game:GetService("Players"):GetPlayers()) do
+					if v ~= game:GetService("Players").LocalPlayer then
+						repeat until v.Character;
+						if not v.Character:FindFirstChild("pESP") then
+							local HLC = Instance.new("Highlight")
+							HLC.FillTransparency = 1
+							HLC.Name = "pESP"
+							HLC.Parent = v.Character
+						end
+					end
+				end;end)
+		elseif bool == false then
+			if connectionsxxnx ~= nil then connectionsxxnx:Disconnect()wait()end
+			connectionsxxnx = nil
+			for _,v in pairs(game:GetService("Players"):GetPlayers()) do
+				if v ~= game:GetService("Players").LocalPlayer then
+					repeat until v.Character;
+					if v.Character:FindFirstChild("pESP") then
+						v.Character:FindFirstChild("pESP"):Destroy()
+					end
+				end
+			end
+		end
+	end)
+	connections = nil
+	local Toggle69 = Section20:AddToggle("Enemies ESP", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			connections = game:GetService("RunService").stepped:Connect(function()
+				if game:GetService("Workspace"):FindFirstChild("BadGuys") then
+					for _,v in pairs(game:GetService("Workspace"):FindFirstChild("BadGuys"):GetChildren()) do
+						if v then
+							if v:FindFirstChild("eESP") then
+								--
+							else
+								local HLC = HL:Clone()
+								HLC.Name = "eESP"
+								HLC.Parent = v
+								HLC.FillTransparency = 1
+							end
+						end;end
+				end
+
+			end)
+		elseif bool == false then
+			if connections ~= nil then connections:Disconnect()wait()end
+			connections = nil
+			if game:GetService("Workspace"):FindFirstChild("BadGuys") then
+				for _,v in pairs(game:GetService("Workspace"):FindFirstChild("BadGuys"):GetChildren()) do
+					if v then
+						if v:FindFirstChild("eESP") then
+							v:FindFirstChild("eESP"):Destroy()
+						else
+							--
+						end
+					end
+				end;end
+		end
+	end)
+	connectionxxx = nil
+	local Toggle69 = Section20:AddToggle("Items ESP", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			connectionxxx = game:GetService("RunService").stepped:Connect(function()
+				for _,v in pairs(GameParts) do
+					if v:IsA("Part") then
+						if v:FindFirstChild("iESP") then
+							--
+						else
+							local HLC = HL:Clone()
+							HLC.Name = "iESP"
+							HLC.Parent = v
+							HLC.FillTransparency = 1
+						end
+					end
+				end
+			end)
+		elseif bool == false then
+			if connectionxxx ~= nil then connectionxxx:Disconnect()wait()end
+			connectionxxx = nil
+			for _,v in pairs(GameParts) do
+				if v:IsA("Part") then
+					if v:FindFirstChild("iESP") then
+						v:FindFirstChild("iESP"):Destroy()
+					else
+						return v
+					end
+				end
+			end
+		end
+	end)
+
+	local SubSection12 = Section202:AddSubSection("Text", {default = false})
+	connectionxxxr1 = 1
+	local Toggle6918 = SubSection12:AddToggle("Enable", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			Library:Notify({title = "Xostum SYPN", text = "Error, Couldn't Enable The 'Text' Drawing."}, function(selection)end)
+			connectionxxxr1 = 2
+		elseif bool == false then
+			if connectionxxxr1 == 2 then
+				connectionxxxr1 = 1
+			end
+		end
+	end)
+	connectionxxxr2 = nil
+	local Toggle6398 = SubSection12:AddToggle("Name", {flag = "Toggle_Flag", default = true}, function(bool)
+		if bool == true then
+			NameOfPlayer = true
+		elseif bool == false then
+			if NameOfPlayer == true then
+				NameOfPlayer = false
+			end
+		end
+	end)
+	connectionxxxr3 = nil
+	local Toggle6928 = SubSection12:AddToggle("Distance", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			DistanceOfPlayer = true
+		elseif bool == false then
+			if DistanceOfPlayer == true then
+				DistanceOfPlayer = false
+			end
+		end
+	end)
+	local Slider4576865437 = SubSection12:AddSlider("TextSize", 1, 100, 23, {toggleable = true, default = true, flag = "Slider_Flag", fireontoggle = true, fireondrag = true, rounded = true}, function(val, bool)
+		TextSizeOfEsp = val
+	end)
+
+	local Section4 = Tab4:AddSection("Credits", {default = true})
+
+	local DualLabel = Section4:AddDualLabel({"Founder & Script Leader", "RegularSVilisz#7789"})
+	local DualLabel66 = Section4:AddDualLabel({"Script Help", "CC1X#1400"})
+	local DualLabel77 = Section4:AddDualLabel({"Concept Ideas", "HSN000999#9922"})
+	local Button = Section4:AddButton("Copy Discord", function() Discord = "https://discord.gg/QFvfZE7Wav"
+		setclipboard(Discord)
+	end)
+
+	local Section5 = Tab4:AddSection("Extras", {default = false})
+
+	local Bind = Section5:AddBind("KeyBind", Enum.KeyCode.RightShift, {toggleable = false, default = false, flag = "Bind_Flag"}, function(keycode)
+		Window:SetKey(keycode)
+	end)
+	local Toggle92 = Section5:AddToggle("Sounds", {flag = "Toggle_Flag", default = false}, function(bool)
+		if bool == true then
+			usesounds = true
+			if usesounds == true then
+				local SDC = SD:Clone()
+				SDC.SoundId = "http://www.roblox.com/asset/?id=5898270155"
+				SDC.Parent = game:GetService("Workspace");SDC:Play()
+				wait(1.2)
+				SDC:Destroy()
+			end
+		elseif bool == false then if usesounds == true then usesounds = false if usesounds == false and bool == false then
+					local SDC = SD:Clone()
+					SDC.SoundId = "http://www.roblox.com/asset/?id=5898279121"
+					SDC.Parent = game:GetService("Workspace");SDC:Play()
+					wait(1.2)
+					SDC:Destroy()
+				end end end
+	end)
+	if game.PlaceId ~= 3851622790 then
+		local IDontKnow = Section5:AddButton("Join Main Server", function()
+			Library:Notify({title = "Xostum SYPN", text = "Xostum Asks For Permission, Click With The Agree Button To Join A Main Server."}, function(selection)
+				if selection == true then
+					Library:Notify({title = "Xostum SYPN", text = "Joining."}, function(selection)end)
+					wait(0.5)
+					game:GetService("TeleportService"):Teleport(3851622790, game:GetService("Players").LocalPlayer)
+				end
+			end)
+		end)
+	end
+	Library:Notify({title = "Xostum SYPN", text = "Xostum Has Been Loaded."}, function(selection)end)
+	wait(0.1)
+	Library:Notify({title = "Hello "..game:GetService("Players").LocalPlayer.Name, text = "Would You Like To Join Our Discord."}, function(selection)if selection==true then 
+
+			local Request = http_request or syn and syn.request or request or nil
+			if Request then
+				local Invite
+				local r = Request(
+					{
+						['Method'] = 'GET',
+						['Headers'] = {
+							['discordLinkRequest'] = "true"
+						},
+						['Url'] = 'https://api.darkhub.cloud/v3/discord/raw'
+					})
+				if r.StatusCode ~= 200 or not r.Successful then
+					Invite = "QFvfZE7Wav"
+				else
+					Invite = r.Body
+				end
+				Request(
+					{
+						['Method'] = 'POST',
+						['Headers'] = {
+							["origin"] = 'https://discord.com',
+							["Content-Type"] = "application/json"
+						},
+						['Url'] = 'http://127.0.0.1:6463/rpc?v=1',
+						['Body'] = game:GetService('HttpService'):JSONEncode({cmd="INVITE_BROWSER",args={code=Invite},nonce=game:GetService('HttpService'):GenerateGUID(false):lower()})
+					}    
+				)
+			end
+
+		end;end)
+end
+warn([[
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+					---------------------------------------------------------------------------
+					/\ Made With Love: RegularSVilisz#7789, CC1X#1400 And Thanks To HSN000999#9922
+								
+								
+					\/ Note: 775 Lines instead of 20k :Laughter:
+					---------------------------------------------------------------------------
+
+								
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+								
+	]])
